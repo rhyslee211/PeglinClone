@@ -1,0 +1,6 @@
+1. Create Differing Orbs
+2. Create Orb reload and spawner - use game management to spawn and kill orbs
+3. Calculate Damage - use game manager to track number of pegs hit, and if crit or not, 
+4. Create enemies and get battling working
+5. Create level design
+6. 
