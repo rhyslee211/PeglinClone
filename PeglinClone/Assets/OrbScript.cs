@@ -12,6 +12,9 @@ public class OrbScript : MonoBehaviour
     private int yVelocity;
     private bool shotOrb = false;
 
+    public int regDamage = 2;
+    public int critDamage = 7;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -61,8 +64,8 @@ public class OrbScript : MonoBehaviour
 
         List<Vector2> trajectoryPoints = new List<Vector2>();
 
-        float maxDur = 1.5f;
-        float stepInterval = 0.03f;
+        float maxDur = 3.5f;
+        float stepInterval = 0.02f;
         int maxSteps = (int)(maxDur / stepInterval);
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
