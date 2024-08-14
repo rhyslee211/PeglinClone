@@ -6,7 +6,7 @@ public class OrbScript : MonoBehaviour
 {
     public Rigidbody2D myRigidbody;
     public CircleCollider2D myCircleCollider;
-    [SerializeField] private float orbSpeed = 5;
+    [SerializeField] private float orbSpeed = 3;
     public LineRenderer myLineRenderer;
     private int xVelocity;
     private int yVelocity;
@@ -30,7 +30,8 @@ public class OrbScript : MonoBehaviour
         }
         if (myRigidbody.position.y < -6)
         {
-            //killOrb();
+            gameManagerScript.instance.handleOrbDeath();
+            Destroy(gameObject);
         }
 
         if (shotOrb == false)
@@ -106,9 +107,12 @@ public class OrbScript : MonoBehaviour
     private bool CheckForCollision(Vector2 position)
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(position, 0.1f); //Measure collision via a small circle at the latest position, dont continue simulating Arc if hit
-        if (hits.Length > 0) //Return true if something is hit, stopping Arc simulation
+        for (int i = 0; i < hits.Length; i++)
         {
-            return true;
+            if (!hits[i].isTrigger)
+            {
+                return true;
+            }
         }
         return false;
     }

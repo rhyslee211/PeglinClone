@@ -42,6 +42,8 @@ public class gameManagerScript : MonoBehaviour
     void Start()
     {
         damageText.text = "Damage: " + damageNum;
+
+        resetBoard();
     }
 
     // Update is called once per frame
@@ -126,9 +128,21 @@ public class gameManagerScript : MonoBehaviour
 
     }
 
+    public void handleOrbDeath() {
+        applyDamage();
+
+        spawnOrb();
+    }
+
     void spawnOrb()
     {
-        //Instantiate
+        Vector2 spawnPos = new Vector2(-1.5f, 0.5f);
+        Instantiate(orb, spawnPos, Quaternion.identity);
+    }
+
+    void applyDamage()
+    {
+        damageNum = 0;
     }
 
 }
