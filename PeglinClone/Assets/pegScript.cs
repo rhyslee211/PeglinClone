@@ -33,9 +33,10 @@ public class pegScript : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private IEnumerator OnCollisionEnter2D(Collision2D collision)
     {
-        myCircleCollider.isTrigger = true;
+
+        
         mySpriteRenderer.color = new Color(1f, 1f, 1f, 0.5f);
         
         if(crit && !gameManagerScript.instance.isCrit){
@@ -48,6 +49,8 @@ public class pegScript : MonoBehaviour
         
         gameManagerScript.instance.addDamage();
 
+        yield return new WaitForSeconds(0.3f);
+        myCircleCollider.isTrigger = true;
     }
    
 

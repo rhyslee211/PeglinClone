@@ -11,18 +11,20 @@ public class gameManagerScript : MonoBehaviour
     private int reloadTime = 1;
     public bool isCrit = false;
     public int damageNum = 0;
-    public int regScore = 2;
-    public int critScore = 7;
+    public int regScore;
+    public int critScore;
 
     public int numResets = 2;
 
     public int numCrits = 3;
 
-    public GameObject orb;
+    public GameObject orbPrefab;
+    public GameObject orbInstance;
 
     public Text damageText;
     public Text critText;
     public Text regText;
+
 
     public static gameManagerScript instance;
 
@@ -41,23 +43,29 @@ public class gameManagerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        damageText.text = "Damage: " + damageNum;
+        damageText.text = "Total Damage: " + damageNum;
 
         resetBoard();
+        reload();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            reload();
-        }
+        
     }
 
     void reload()
     {
+
         
+
+        spawnOrb(4,3);
+
+        OrbScript orbScript = orbInstance.GetComponent<OrbScript>();
+
+        critText.text = "Crit Damage: " + orbScript.critDamage;
+        regText.text = "Normal Damage: " + orbScript.regDamage;
     }
 
     public void addDamage() {
@@ -131,13 +139,22 @@ public class gameManagerScript : MonoBehaviour
     public void handleOrbDeath() {
         applyDamage();
 
-        spawnOrb();
+        reload();
     }
 
-    void spawnOrb()
+    void spawnOrb(int regDamage, int critDamage)
     {
         Vector2 spawnPos = new Vector2(-1.5f, 0.5f);
-        Instantiate(orb, spawnPos, Quaternion.identity);
+        orbInstance = Instantiate(orbPrefab, spawnPos, Quaternion.identity);
+
+        OrbScript orbScript = orbInstance.GetComponent<OrbScript>();
+
+        orbScript.setOrbDamage(regDamage,critDamage);
+
+        regScore = orbScript.regDamage;
+        critScore = orbScript.critDamage;
+
+
     }
 
     void applyDamage()

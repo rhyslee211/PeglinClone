@@ -30,8 +30,8 @@ public class OrbScript : MonoBehaviour
         }
         if (myRigidbody.position.y < -6)
         {
-            gameManagerScript.instance.handleOrbDeath();
             Destroy(gameObject);
+            gameManagerScript.instance.handleOrbDeath();
         }
 
         if (shotOrb == false)
@@ -44,6 +44,12 @@ public class OrbScript : MonoBehaviour
         }
 
     }
+
+    public void setOrbDamage(int inputRegDamage, int inputCritDamage){
+        regDamage = inputRegDamage;
+        critDamage =  inputCritDamage;
+    }
+
 
     private void shootOrb()
     {
