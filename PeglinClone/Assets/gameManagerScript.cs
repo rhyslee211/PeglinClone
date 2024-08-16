@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Linq;
 
 
 public class gameManagerScript : MonoBehaviour
@@ -24,9 +25,30 @@ public class gameManagerScript : MonoBehaviour
     public Text damageText;
     public Text critText;
     public Text regText;
+    public Text orbNameText;
+
+    public Transform orbListContent; 
+    public Text orbTextPrefab;
 
 
     public static gameManagerScript instance;
+
+    public class Orb {
+
+        public string name { get; set; }
+        public int regDamage { get; set; }
+        public int critDamage { get; set; }
+
+        public Orb(string inputName, int inputRegDamage, int inputCritDamage){
+            name = inputName;
+            regDamage = inputRegDamage;
+            critDamage = inputCritDamage;
+        }
+
+    }
+
+    public List<Orb> liveOrbMag = new List<Orb>();
+    public List<Orb> orbMag = new List<Orb>();
 
     private void Awake()
     {
@@ -43,10 +65,21 @@ public class gameManagerScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        orbMag.Add(new Orb("Stone",3,4));
+        orbMag.Add(new Orb("Dagger",2,7));
+        orbMag.Add(new Orb("Stone",3,4));
+        orbMag.Add(new Orb("Stone",3,4));
+        orbMag.Add(new Orb("Dagger",2,7));
+
         damageText.text = "Total Damage: " + damageNum;
 
-        resetBoard();
+
         reload();
+        populateOrbMagList();
+
+        resetBoard();
+        getNextOrb();
     }
 
     // Update is called once per frame
@@ -55,17 +88,27 @@ public class gameManagerScript : MonoBehaviour
         
     }
 
-    void reload()
+    void reload(){
+        liveOrbMag = orbMag.ToList();
+    }
+
+    void getNextOrb()
     {
 
-        
+        Orb cOrb = liveOrbMag[0];
+        liveOrbMag.RemoveAt(0);
 
-        spawnOrb(4,3);
+        spawnOrb(cOrb.regDamage,cOrb.critDamage);
 
-        OrbScript orbScript = orbInstance.GetComponent<OrbScript>();
+        critText.text = "Crit Damage: " + critScore;
+        regText.text = "Normal Damage: " + regScore;
+        orbNameText.text = cOrb.name;
 
-        critText.text = "Crit Damage: " + orbScript.critDamage;
-        regText.text = "Normal Damage: " + orbScript.regDamage;
+        if(liveOrbMag.Count == 0){
+            reload();
+        }
+
+        populateOrbMagList();
     }
 
     public void addDamage() {
@@ -139,7 +182,7 @@ public class gameManagerScript : MonoBehaviour
     public void handleOrbDeath() {
         applyDamage();
 
-        reload();
+        getNextOrb();
     }
 
     void spawnOrb(int regDamage, int critDamage)
@@ -154,6 +197,22 @@ public class gameManagerScript : MonoBehaviour
         regScore = orbScript.regDamage;
         critScore = orbScript.critDamage;
 
+
+    }
+
+    void populateOrbMagList(){
+
+        foreach (Transform child in orbListContent){
+            Destroy(child.gameObject);
+        }
+
+        foreach (var item in liveOrbMag){
+
+            Text itemText = Instantiate(orbTextPrefab, orbListContent);
+
+            itemText.text = item.name;
+
+        }
 
     }
 
