@@ -60,6 +60,10 @@ public class gameManagerScript : MonoBehaviour
             attackDamge = inputAttackDamage;
         }
 
+        public string ToString(){
+            return("Name: " + name + "; Health: " + health + "; Damage: " + attackDamge);
+        }
+
     }
 
     public List<Orb> liveOrbMag = new List<Orb>();
@@ -90,12 +94,15 @@ public class gameManagerScript : MonoBehaviour
         orbMag.Add(new Orb("Stone",3,4));
         orbMag.Add(new Orb("Dagger",2,7));
 
-        rangedMonsterList.add(new Monster("Bramball Plant", 50, 4));
+        rangedMonsterList.Add(new Monster("Bramball Plant", 50, 4));
 
         meleeMonsterList.Add(null);
         meleeMonsterList.Add(null);
         meleeMonsterList.Add(new Monster("Green Slime",60, 5));
         meleeMonsterList.Add(new Monster("Blue Slime", 80, 7));
+
+        Debug.Log(listMonsters());
+        Debug.Log("Player Health: " + playerHealth);
 
         damageText.text = "Total Damage: " + damageNum;
 
@@ -146,7 +153,7 @@ public class gameManagerScript : MonoBehaviour
 
         damageText.text = "Damage: " + damageNum;
 
-        Debug.Log("Damage: " + damageNum);
+        //Debug.Log("Damage: " + damageNum);
     }
 
     public void setCrit() {
@@ -239,6 +246,19 @@ public class gameManagerScript : MonoBehaviour
 
         enemyTurn();
 
+        if(isPlayerDead()){
+            gameLose();
+            return;
+        }
+
+        if(allMonstersDead()){
+            gameWin();
+            return;
+        }
+
+        Debug.Log(listMonsters());
+        Debug.Log("Player Health: " + playerHealth);
+
         getNextOrb();
     }
 
@@ -283,12 +303,16 @@ public class gameManagerScript : MonoBehaviour
     }
 
     void meleeEnemyTurn(){
+
+        if(meleeMonsterList.Count == 0){
+            return;
+        }
         
         if(meleeMonsterList[0] == null){
             meleeMonsterList.RemoveAt(0);
         }
         else{
-            applyDamge(meleeMonsterList[0].attackDamge);
+            applyDamage(meleeMonsterList[0].attackDamge);
         }
 
     }
@@ -302,6 +326,59 @@ public class gameManagerScript : MonoBehaviour
     void applyDamage(int damage)
     {
         playerHealth = playerHealth - damage;
+    }
+
+    bool isPlayerDead(){
+        if(playerHealth <= 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    bool allMonstersDead() {
+        foreach(Monster monster in meleeMonsterList){
+            if(monster != null){
+                return false;
+            }
+        }
+        foreach(Monster monster in rangedMonsterList){
+            if(monster != null){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    void gameLose() {
+        Debug.Log("Game Lost :(");
+    }
+
+    void gameWin() {
+        Debug.Log("Game Won :)");
+    }
+
+    string listMonsters(){
+
+        string monsterString="";
+
+        foreach(Monster monster in meleeMonsterList){
+            if(monster != null){
+                monsterString = monsterString + monster.ToString() + "||";
+            }
+            else{
+                monsterString = monsterString + "Empty Space ||";
+            }
+        }
+        foreach(Monster monster in rangedMonsterList){
+            if(monster != null){
+                monsterString = monsterString + "||" + monster.ToString();
+            }
+        }
+
+        return(monsterString);
     }
 
 }
