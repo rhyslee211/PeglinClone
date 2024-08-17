@@ -14,6 +14,7 @@ public class gameManagerScript : MonoBehaviour
     public int damageNum = 0;
     public int regScore;
     public int critScore;
+    public int playerHealth = 80;
 
     public int numResets = 2;
 
@@ -47,8 +48,25 @@ public class gameManagerScript : MonoBehaviour
 
     }
 
+    public class Monster {
+        
+        public string name { get; set; }
+        public int health { get; set; }
+        public int attackDamge { get; set; }
+
+        public Monster(string inputName, int inputHealth, int inputAttackDamage){
+            name = inputName;
+            health = inputHealth;
+            attackDamge = inputAttackDamage;
+        }
+
+    }
+
     public List<Orb> liveOrbMag = new List<Orb>();
     public List<Orb> orbMag = new List<Orb>();
+
+    public List<Monster> meleeMonsterList = new List<Monster>();
+    public List<Monster> rangedMonsterList = new List<Monster>();
 
     private void Awake()
     {
@@ -72,11 +90,17 @@ public class gameManagerScript : MonoBehaviour
         orbMag.Add(new Orb("Stone",3,4));
         orbMag.Add(new Orb("Dagger",2,7));
 
+        rangedMonsterList.add(new Monster("Bramball Plant", 50, 4));
+
+        meleeMonsterList.Add(null);
+        meleeMonsterList.Add(null);
+        meleeMonsterList.Add(new Monster("Green Slime",60, 5));
+        meleeMonsterList.Add(new Monster("Blue Slime", 80, 7));
+
         damageText.text = "Total Damage: " + damageNum;
 
 
         reload();
-        populateOrbMagList();
 
         resetBoard();
         getNextOrb();
@@ -179,13 +203,7 @@ public class gameManagerScript : MonoBehaviour
 
     }
 
-    public void handleOrbDeath() {
-        applyDamage();
-
-        getNextOrb();
-    }
-
-    void spawnOrb(int regDamage, int critDamage)
+        void spawnOrb(int regDamage, int critDamage)
     {
         Vector2 spawnPos = new Vector2(-1.5f, 0.5f);
         orbInstance = Instantiate(orbPrefab, spawnPos, Quaternion.identity);
@@ -216,9 +234,74 @@ public class gameManagerScript : MonoBehaviour
 
     }
 
-    void applyDamage()
-    {
+    public void handleOrbDeath() {
+        playerTurn();
+
+        enemyTurn();
+
+        getNextOrb();
+    }
+
+    void playerTurn() {
+
+        attackClosestEnemy(damageNum);
+
         damageNum = 0;
+    }
+
+    void attackClosestEnemy(int damage){
+        for(int i = 0; i < meleeMonsterList.Count; i++){
+            if(meleeMonsterList[i] != null){
+                meleeMonsterList[i].health = meleeMonsterList[i].health - damage;
+
+                if(meleeMonsterList[i].health <= 0){
+                    meleeMonsterList[i]= null;
+                }
+
+                return;
+            }
+        }
+        for(int i = 0; i < rangedMonsterList.Count; i++){
+            if(rangedMonsterList[i] != null){
+                rangedMonsterList[i].health = rangedMonsterList[i].health - damage;
+
+                if(rangedMonsterList[i].health <= 0){
+                    rangedMonsterList[i]= null;
+                }
+
+                return;
+            }
+        }
+    }
+
+    void enemyTurn(){
+
+        meleeEnemyTurn();
+
+        rangedEnemyTurn();
+
+    }
+
+    void meleeEnemyTurn(){
+        
+        if(meleeMonsterList[0] == null){
+            meleeMonsterList.RemoveAt(0);
+        }
+        else{
+            applyDamge(meleeMonsterList[0].attackDamge);
+        }
+
+    }
+
+    void rangedEnemyTurn(){
+        foreach(Monster monster in rangedMonsterList){
+            applyDamage(monster.attackDamge);
+        }
+    }
+
+    void applyDamage(int damage)
+    {
+        playerHealth = playerHealth - damage;
     }
 
 }
