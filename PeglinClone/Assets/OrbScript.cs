@@ -12,6 +12,8 @@ public class OrbScript : MonoBehaviour
     private int yVelocity;
     private bool shotOrb = false;
 
+    public float explosionForce = 10;
+
     public int regDamage = 2;
     public int critDamage = 7;
 
@@ -28,7 +30,7 @@ public class OrbScript : MonoBehaviour
         {
             shootOrb();
         }
-        if (myRigidbody.position.y < -6)
+        if (myRigidbody.position.y < -8)
         {
             Destroy(gameObject);
             gameManagerScript.instance.handleOrbDeath();

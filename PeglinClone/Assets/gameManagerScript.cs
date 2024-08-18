@@ -8,13 +8,17 @@ using System.Linq;
 
 public class gameManagerScript : MonoBehaviour
 {
-
-    private int reloadTime = 1;
     public bool isCrit = false;
     public int damageNum = 0;
+    public int bombNum = 0;
+
+    
+    public int bombScore = 50;
     public int regScore;
     public int critScore;
     public int playerHealth = 80;
+
+    public Button restartButton;
 
     public int numResets = 2;
 
@@ -27,6 +31,7 @@ public class gameManagerScript : MonoBehaviour
     public Text critText;
     public Text regText;
     public Text orbNameText;
+    public Text playerHealthText;
 
     public Transform orbListContent; 
     public Text orbTextPrefab;
@@ -102,9 +107,12 @@ public class gameManagerScript : MonoBehaviour
         meleeMonsterList.Add(new Monster("Blue Slime", 80, 7));
 
         Debug.Log(listMonsters());
-        Debug.Log("Player Health: " + playerHealth);
 
         damageText.text = "Total Damage: " + damageNum;
+        playerHealthText.text = "Player Health: " + playerHealth;
+
+        Button btn = restartButton.GetComponent<Button>();
+        btn.onClick.AddListener(restartLevel);
 
 
         reload();
@@ -117,6 +125,10 @@ public class gameManagerScript : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void restartLevel(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void reload(){
@@ -154,6 +166,10 @@ public class gameManagerScript : MonoBehaviour
         damageText.text = "Damage: " + damageNum;
 
         //Debug.Log("Damage: " + damageNum);
+    }
+
+    public void addBomb() {
+        bombNum++;
     }
 
     public void setCrit() {
@@ -210,9 +226,9 @@ public class gameManagerScript : MonoBehaviour
 
     }
 
-        void spawnOrb(int regDamage, int critDamage)
+    void spawnOrb(int regDamage, int critDamage)
     {
-        Vector2 spawnPos = new Vector2(-1.5f, 0.5f);
+        Vector2 spawnPos = new Vector2(0f, 1.0f);
         orbInstance = Instantiate(orbPrefab, spawnPos, Quaternion.identity);
 
         OrbScript orbScript = orbInstance.GetComponent<OrbScript>();
@@ -242,17 +258,20 @@ public class gameManagerScript : MonoBehaviour
     }
 
     public void handleOrbDeath() {
+
         playerTurn();
-
-        enemyTurn();
-
-        if(isPlayerDead()){
-            gameLose();
-            return;
-        }
 
         if(allMonstersDead()){
             gameWin();
+            return;
+        }
+ 
+        enemyTurn();
+
+        playerHealthText.text = "Player Health: " + playerHealth;
+
+        if(isPlayerDead()){
+            gameLose();
             return;
         }
 
@@ -267,6 +286,38 @@ public class gameManagerScript : MonoBehaviour
         attackClosestEnemy(damageNum);
 
         damageNum = 0;
+
+        bombAttack();
+
+        bombNum = 0;
+
+    }
+
+    void bombAttack() {
+        for(int i = 0; i < bombNum; i++){
+            throwBomb();
+        }
+    }
+
+    void throwBomb(){
+        for(int i = 0; i < meleeMonsterList.Count; i++){
+            if(meleeMonsterList[i] != null){
+                meleeMonsterList[i].health = meleeMonsterList[i].health - bombScore;
+
+                if(meleeMonsterList[i].health <= 0){
+                    meleeMonsterList[i]= null;
+                }
+            }
+        }
+        for(int i = 0; i < rangedMonsterList.Count; i++){
+            if(rangedMonsterList[i] != null){
+                rangedMonsterList[i].health = rangedMonsterList[i].health - bombScore;
+
+                if(rangedMonsterList[i].health <= 0){
+                    rangedMonsterList.RemoveAt(i);
+                }
+            }
+        }
     }
 
     void attackClosestEnemy(int damage){
@@ -286,7 +337,7 @@ public class gameManagerScript : MonoBehaviour
                 rangedMonsterList[i].health = rangedMonsterList[i].health - damage;
 
                 if(rangedMonsterList[i].health <= 0){
-                    rangedMonsterList[i]= null;
+                    rangedMonsterList.RemoveAt(i);
                 }
 
                 return;
