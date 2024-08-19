@@ -36,6 +36,19 @@ public class gameManagerScript : MonoBehaviour
     public Transform orbListContent; 
     public Text orbTextPrefab;
 
+    public Image[] meleeSpots;
+    public Text[] meleeHealthbars;
+
+    public Image[] rangedSpots;
+    public Text[] rangedHealthbars;
+
+    public Sprite blueSlimeSprite;
+    public Sprite greenSlimeSprite;
+    public Sprite shooterPlantSprite;
+
+    private Dictionary<string,Sprite> monsterSpriteDict = new Dictionary<string,Sprite>();
+
+    public Sprite emptySprite;
 
     public static gameManagerScript instance;
 
@@ -108,12 +121,17 @@ public class gameManagerScript : MonoBehaviour
 
         Debug.Log(listMonsters());
 
+        monsterSpriteDict.Add("Blue Slime", blueSlimeSprite);
+        monsterSpriteDict.Add("Green Slime", greenSlimeSprite);
+        monsterSpriteDict.Add("Bramball Plant", shooterPlantSprite);
+
         damageText.text = "Total Damage: " + damageNum;
         playerHealthText.text = "Player Health: " + playerHealth;
 
         Button btn = restartButton.GetComponent<Button>();
         btn.onClick.AddListener(restartLevel);
 
+        updateMonsterSprites();
 
         reload();
 
@@ -260,6 +278,8 @@ public class gameManagerScript : MonoBehaviour
     public void handleOrbDeath() {
 
         playerTurn();
+
+        updateMonsterSprites();
 
         if(allMonstersDead()){
             gameWin();
@@ -409,6 +429,72 @@ public class gameManagerScript : MonoBehaviour
 
     void gameWin() {
         Debug.Log("Game Won :)");
+    }
+
+    void updateMonsterSprites(){
+
+        //Debug.Log(meleeMonsterList.Count);
+
+        for(int i = 0; i < meleeSpots.Length; i++){
+            if(i < meleeMonsterList.Count){
+                if(meleeMonsterList[i] != null){
+                    //Debug.Log(monsterSpriteDict[meleeMonsterList[i].name].sprite.name);
+                    Sprite spriteToAssign = monsterSpriteDict[meleeMonsterList[i].name];
+                    meleeSpots[i].sprite = spriteToAssign;
+                    meleeSpots[i].enabled = true;
+
+                    meleeHealthbars[i].text = "Health: " + meleeMonsterList[i].health;
+                    meleeHealthbars[i].enabled = true;
+
+                    Debug.Log("Assigned Sprite: " + spriteToAssign.name);
+                }
+                else{
+                    meleeSpots[i].sprite = emptySprite;
+                    meleeSpots[i].enabled = false;
+
+                    meleeHealthbars[i].text = "";
+                    meleeHealthbars[i].enabled = false;
+                }
+            }
+            else{
+                meleeSpots[i].sprite = emptySprite;
+                meleeSpots[i].enabled = false;
+
+                meleeHealthbars[i].text = "";
+                meleeHealthbars[i].enabled = false;
+            }
+        }
+
+        for(int i = 0; i < rangedSpots.Length; i++){
+            if(i < rangedMonsterList.Count){
+                if(rangedMonsterList[i] != null){
+                    //Debug.Log(monsterSpriteDict[meleeMonsterList[i].name].sprite.name);
+                    Sprite spriteToAssign = monsterSpriteDict[rangedMonsterList[i].name];
+                    rangedSpots[i].sprite = spriteToAssign;
+                    rangedSpots[i].enabled = true;
+
+                    rangedHealthbars[i].text = "Health: " + rangedMonsterList[i].health;
+                    rangedHealthbars[i].enabled = true;
+
+                    Debug.Log("Assigned Sprite: " + spriteToAssign.name);
+                }
+                else{
+                    rangedSpots[i].sprite = emptySprite;
+                    rangedSpots[i].enabled = false;
+
+                    rangedHealthbars[i].text = "";
+                    rangedHealthbars[i].enabled = false;
+                }
+            }
+            else{
+                rangedSpots[i].sprite = emptySprite;
+                rangedSpots[i].enabled = false;
+
+                rangedHealthbars[i].text = "";
+                rangedHealthbars[i].enabled = false;
+            }
+        }
+
     }
 
     string listMonsters(){
